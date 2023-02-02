@@ -12,7 +12,7 @@ on:
   workflow_dispatch:
 
 env:
-  RELEASE_TITLE: "antiresourcereload - build ${{github.run_number}}"
+  RELEASE_TITLE: "antiresourcereload 1.16.5 - build ${{github.run_number}}"
   RELEASE_NUMBER: "${{github.run_number}}"
   RELEASE_FILE: "build/libs/*${{github.run_number}}.0.0.jar"
 
