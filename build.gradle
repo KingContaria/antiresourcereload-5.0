@@ -1,95 +1,59 @@
 plugins {
-	id 'fabric-loom' version '1.0-SNAPSHOT'
-	id 'maven-publish'
-	id 'org.ajoberstar.grgit' version '4.1.0'
+	alias libs.plugins.fabric.loom
+	id "maven-publish"
 }
 
-def getVersionMetadata() {
-	// CI builds version numbers
-	def build_id = System.getenv("RELEASE_NUMBER")
-	if (build_id != null) {
-		return build_id + ".0.0"
-	}
+version = "$mod_version+$target_version"
+group = maven_group
 
-	// Development builds
-	if (grgit == null) {
-		return "dev"
-	}
-
-	// Named development builds
-	def id = grgit.head().abbreviatedId
-	if (!grgit.status().clean) {
-		id += "-dirty"
-	}
-
-	return "rev.${id}"
+base {
+	archivesName = archives_name
 }
-
-archivesBaseName = "${project.mod_id}-${project.supported_versions}"
-version = "${getVersionMetadata()}"
-group = project.maven_group
 
 repositories {
-	// Add repositories to retrieve artifacts from in here.
-	// You should only use this when depending on other mods because
-	// Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
-	// See https://docs.gradle.org/current/userguide/declaring_repositories.html
-	// for more information about repositories.
+	maven { url "https://s01.oss.sonatype.org/content/repositories/snapshots" }
+}
+
+loom {
+	decompilers {
+		vineflower {
+			options.putAll(["mark-corresponding-synthetics": "1", "ind": "    "])
+		}
+	}
+	mixin {
+		useLegacyMixinAp = false
+	}
 }
 
 dependencies {
-	// To change the versions see the gradle.properties file
-	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
-	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+	minecraft libs.minecraft
+	mappings variantOf(libs.yarn.mappings) { classifier "v2" }
+	modImplementation libs.fabric.loader
+	vineflowerDecompilerClasspath libs.vineflower
 }
 
 processResources {
-	inputs.property "mod_id", project.mod_id
-	inputs.property "version", project.version
-	filteringCharset "UTF-8"
-
-	filesMatching("fabric.mod.json") {
-		expand "mod_id": project.mod_id, "version": project.version
+	filesMatching "fabric.mod.json", {
+		expand "version": version
 	}
 }
 
 tasks.withType(JavaCompile).configureEach {
-	// Minecraft 1.18 (1.18-pre2) upwards uses Java 17.
-	// it.options.release = 17
+	it.options.encoding = "UTF-8"
+	if (JavaVersion.current().isJava9Compatible()) it.options.release.set(8)
 }
 
 java {
-	// Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
-	// if it is present.
-	// If you remove this line, sources will not be generated.
-	withSourcesJar()
+	sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
 }
 
 jar {
-	from("LICENSE") {
-		rename { "${it}_${project.archivesBaseName}"}
-	}
+	from "LICENSE"
 }
 
-// configure the maven publication
 publishing {
-	publications {
-		mavenJava(MavenPublication) {
-			artifact(remapJar) {
-				builtBy remapJar
-			}
-			artifact(sourcesJar) {
-				builtBy remapSourcesJar
-			}
-		}
+	publications.create("mavenJava", MavenPublication) {
+		from components.java
 	}
-
-	// See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
-	repositories {
-		// Add repositories to publish to here.
-		// Notice: This block does NOT have the same function as the block in the top level.
-		// The repositories here will be used for publishing your artifact, not for
-		// retrieving dependencies.
-	}
+	repositories {}
 }
