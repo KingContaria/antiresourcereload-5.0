@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "id": "${mod_id}",
+  "id": "antiresourcereload",
   "version": "${version}",
   "name": "AntiResourceReload",
   "description": "Disables the monitored reload upon world creation.",
