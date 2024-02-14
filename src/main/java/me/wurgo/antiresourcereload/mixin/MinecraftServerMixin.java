@@ -1,21 +1,25 @@
 package me.wurgo.antiresourcereload.mixin;
 
+import com.google.common.collect.Lists;
 import me.wurgo.antiresourcereload.AntiResourceReload;
 import net.minecraft.loot.LootManager;
 import net.minecraft.loot.condition.LootConditionManager;
 import net.minecraft.recipe.RecipeManager;
-import net.minecraft.resource.ReloadableResourceManager;
+import net.minecraft.resource.*;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.ServerAdvancementLoader;
 import net.minecraft.server.function.CommandFunctionManager;
 import net.minecraft.tag.RegistryTagManager;
 import net.minecraft.world.level.LevelProperties;
+import org.apache.logging.log4j.core.Logger;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
+
+import java.util.List;
 
 @Mixin(MinecraftServer.class)
 public abstract class MinecraftServerMixin {
@@ -27,6 +31,9 @@ public abstract class MinecraftServerMixin {
     @Mutable @Shadow @Final private LootManager lootManager;
     @Mutable @Shadow @Final private CommandFunctionManager commandFunctionManager;
     @Mutable @Shadow @Final private ServerAdvancementLoader advancementLoader;
+
+    @Shadow @Final private static Logger LOGGER;
+    @Shadow @Final private ResourcePackManager<ResourcePackProfile> dataPackManager;
 
     @Redirect(
             method = "loadWorldDataPacks",
@@ -64,6 +71,18 @@ public abstract class MinecraftServerMixin {
             if (AntiResourceReload.hasSeenRecipes) {
                 ((RecipeManagerAccess) this.recipeManager).invokeApply(AntiResourceReload.recipes, null, null);
             }
+
+            // should only be the vanilla pack
+            // logic taken from MinecraftServer#reloadDataPacks
+            List<ResourcePackProfile> list = Lists.newArrayList(this.dataPackManager.getEnabledProfiles());
+
+            for (ResourcePackProfile resourcePackProfile : this.dataPackManager.getProfiles()) {
+                if (!levelProperties.getDisabledDataPacks().contains(resourcePackProfile.getName()) && !list.contains(resourcePackProfile)) {
+                    LOGGER.info("Found new data pack {}, loading it automatically", resourcePackProfile.getName());
+                    resourcePackProfile.getInitialPosition().insert(list, resourcePackProfile, profile -> profile, false);
+                }
+            }
+            this.dataPackManager.setEnabledProfiles(list);
         }
     }
 }
