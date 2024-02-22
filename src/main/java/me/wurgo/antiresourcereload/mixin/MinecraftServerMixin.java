@@ -10,7 +10,7 @@ import net.minecraft.server.ServerAdvancementLoader;
 import net.minecraft.server.function.CommandFunctionManager;
 import net.minecraft.tag.RegistryTagManager;
 import net.minecraft.world.level.LevelProperties;
-import org.apache.logging.log4j.core.Logger;
+import org.apache.logging.log4j.Logger;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Mutable;
