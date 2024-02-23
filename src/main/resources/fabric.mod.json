@@ -19,14 +19,19 @@
   },
   "license": "MIT",
   "environment": "client",
-  "mixins": ["antiresourcereload.mixins.json"],
+  "mixins": [
+    "antiresourcereload.mixins.json"
+  ],
   "entrypoints": {
     "main": [
       "me.wurgo.antiresourcereload.AntiResourceReload"
     ]
   },
   "depends": {
-    "minecraft": "1.15.x"
+    "minecraft": [
+      "1.15.x",
+      "1.16-alpha.20.13.inf"
+    ]
   },
   "breaks": {
     "speedrunigt": "<7.2"
