@@ -1,60 +1,76 @@
 plugins {
-	alias libs.plugins.fabric.loom
-	id "maven-publish"
+	id 'fabric-loom' version '1.4-SNAPSHOT'
+	id 'maven-publish'
 }
 
-version = "$mod_version+$target_version"
-group = maven_group
-
-base {
-	archivesName = archives_name
-}
+archivesBaseName = project.mod_id
+version = "${project.mod_version}+${project.supported_versions}"
+group = project.maven_group
 
 repositories {
-	maven { url "https://s01.oss.sonatype.org/content/repositories/snapshots" }
-	maven { url "https://jitpack.io" }
-}
-
-loom {
-	decompilers {
-		vineflower {
-			options.putAll(["mark-corresponding-synthetics": "1", "ind": "    "])
-		}
-	}
-	mixin {
-		useLegacyMixinAp = false
-	}
+	maven { url 'https://jitpack.io' }
 }
 
 dependencies {
-	minecraft libs.minecraft
-	mappings variantOf(libs.yarn.mappings) { classifier "v2" }
-	modImplementation libs.fabric.loader
-	vineflowerDecompilerClasspath libs.vineflower
+	// To change the versions see the gradle.properties file
+	minecraft "com.mojang:minecraft:${project.minecraft_version}"
+	mappings "dev.tildejustin:yarn:${project.yarn_mappings}:v2"
+	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 }
 
 processResources {
-	filesMatching "fabric.mod.json", {
-		expand "version": version
+	inputs.property "mod_id", project.mod_id
+	inputs.property "version", project.version
+	filteringCharset "UTF-8"
+
+	filesMatching("fabric.mod.json") {
+		expand "mod_id": project.mod_id, "version": project.version
 	}
 }
 
 tasks.withType(JavaCompile).configureEach {
 	it.options.encoding = "UTF-8"
-	if (JavaVersion.current().isJava9Compatible()) it.options.release.set(8)
+
+	def targetVersion = 8
+	if (JavaVersion.current().isJava9Compatible()) {
+		it.options.release = targetVersion
+	}
 }
 
 java {
-	sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
+	sourceCompatibility = JavaVersion.VERSION_1_8
+	targetCompatibility = JavaVersion.VERSION_1_8
+
+	// Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
+	// if it is present.
+	// If you remove this line, sources will not be generated.
+	withSourcesJar()
 }
 
 jar {
-	from "LICENSE"
+	from("LICENSE") {
+		rename { "${it}_${project.archivesBaseName}" }
+	}
 }
 
+// configure the maven publication
 publishing {
-	publications.create("mavenJava", MavenPublication) {
-		from components.java
+	publications {
+		mavenJava(MavenPublication) {
+			artifact(remapJar) {
+				builtBy remapJar
+			}
+			artifact(sourcesJar) {
+				builtBy remapSourcesJar
+			}
+		}
 	}
-	repositories {}
+
+	// See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
+	repositories {
+		// Add repositories to publish to here.
+		// Notice: This block does NOT have the same function as the block in the top level.
+		// The repositories here will be used for publishing your artifact, not for
+		// retrieving dependencies.
+	}
 }
