@@ -1,10 +1,11 @@
 package me.wurgo.antiresourcereload.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
-import com.llamalad7.mixinextras.injector.WrapWithCondition;
+import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
+import com.mojang.authlib.GameProfileRepository;
 import me.wurgo.antiresourcereload.AntiResourceReload;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.resource.*;
@@ -13,9 +14,11 @@ import net.minecraft.tag.BlockTags;
 import net.minecraft.tag.EntityTypeTags;
 import net.minecraft.tag.FluidTags;
 import net.minecraft.tag.ItemTags;
+import net.minecraft.util.UserCache;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
+import java.io.File;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -81,5 +84,23 @@ public abstract class MinecraftClientMixin {
                 manager.getRegistryTagManager().items() != ItemTags.getContainer() ||
                 manager.getRegistryTagManager().fluids() != FluidTags.getContainer() ||
                 manager.getRegistryTagManager().entityTypes() != EntityTypeTags.getContainer();
+    }
+
+    @WrapOperation(
+            method = {
+                    "startIntegratedServer(Ljava/lang/String;Lnet/minecraft/util/registry/RegistryTracker$Modifiable;Ljava/util/function/Function;Lcom/mojang/datafixers/util/Function4;ZLnet/minecraft/client/MinecraftClient$WorldLoadAction;)V",
+                    "joinWorld"
+            },
+            at = @At(
+                    value = "NEW",
+                    target = "(Lcom/mojang/authlib/GameProfileRepository;Ljava/io/File;)Lnet/minecraft/util/UserCache;"
+            ),
+            require = 2
+    )
+    private UserCache cacheUserCache(GameProfileRepository profileRepository, File cacheFile, Operation<UserCache> original) {
+        if (AntiResourceReload.userCache == null) {
+            AntiResourceReload.userCache = original.call(profileRepository, cacheFile);
+        }
+        return AntiResourceReload.userCache;
     }
 }

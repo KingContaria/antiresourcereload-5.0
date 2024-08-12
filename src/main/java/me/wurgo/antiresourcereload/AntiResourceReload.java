@@ -3,6 +3,7 @@ package me.wurgo.antiresourcereload;
 import com.google.gson.JsonElement;
 import net.minecraft.resource.ServerResourceManager;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.UserCache;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -16,7 +17,9 @@ public class AntiResourceReload {
     public static Map<Identifier, JsonElement> recipes;
     public static boolean hasSeenRecipes;
 
+    public static UserCache userCache;
+
     public static void log(String message) {
-        LOGGER.info("[AntiResourceReload] " + message);
+        LOGGER.info("[AntiResourceReload] {}", message);
     }
 }
