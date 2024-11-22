@@ -8,12 +8,15 @@ import net.minecraft.resource.ReloadableResourceManager;
 import net.minecraft.server.ServerAdvancementLoader;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.function.CommandFunctionManager;
+import net.minecraft.structure.Structure;
 import net.minecraft.tag.RegistryTagManager;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.UserCache;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 public class AntiResourceReload {
@@ -30,11 +33,13 @@ public class AntiResourceReload {
 
     public static CommandManager commandManager;
 
+    public static final Map<Identifier, Structure> structures = Collections.synchronizedMap(new HashMap<>());
+
     public static UserCache userCache;
 
     public static boolean hasInitializedShapeCache;
     public static boolean hasSeenRecipes;
-    
+
     public static void log(String message) {
         LOGGER.info("[AntiResourceReload] {}", message);
     }
