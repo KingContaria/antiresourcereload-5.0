@@ -5,10 +5,11 @@
   "compatibilityLevel": "JAVA_8",
   "client": [
     "MinecraftClientMixin",
-    "ServerResourceManagerMixin",
+    "RecipeBookWidgetMixin",
     "RecipeManagerAccess",
     "RecipeManagerMixin",
-    "RecipeBookWidgetMixin"
+    "ServerResourceManagerMixin",
+    "StructureManagerMixin"
   ],
   "injectors": {
     "defaultRequire": 1
