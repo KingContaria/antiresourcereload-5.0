@@ -9,6 +9,7 @@
     "RecipeManagerAccess",
     "RecipeManagerMixin",
     "ServerResourceManagerMixin",
+    "Structure$PalettedBlockInfoListMixin",
     "StructureManagerMixin"
   ],
   "injectors": {
