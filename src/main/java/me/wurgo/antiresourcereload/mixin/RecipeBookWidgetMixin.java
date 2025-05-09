@@ -9,8 +9,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(RecipeBookWidget.class)
 public class RecipeBookWidgetMixin {
-    @Inject(method = "initialize", at = @At("HEAD"))
-    public void antiresourcereload_updateHasSeenRecipes(CallbackInfo ci) {
+
+    @Inject(
+            method = "initialize",
+            at = @At("HEAD")
+    )
+    public void updateHasSeenRecipes(CallbackInfo ci) {
         AntiResourceReload.hasSeenRecipes = true;
     }
 }
