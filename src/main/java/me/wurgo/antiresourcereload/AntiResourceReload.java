@@ -7,6 +7,7 @@ import net.minecraft.loot.condition.LootConditionManager;
 import net.minecraft.recipe.RecipeManager;
 import net.minecraft.resource.ReloadableResourceManager;
 import net.minecraft.server.ServerAdvancementLoader;
+import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.function.CommandFunctionManager;
 import net.minecraft.tag.RegistryTagManager;
 import net.minecraft.util.Identifier;
@@ -27,6 +28,8 @@ public class AntiResourceReload implements ModInitializer {
     public static ServerAdvancementLoader advancementLoader;
     public static CommandFunctionManager commandFunctionManager;
     public static Map<Identifier, JsonElement> recipes;
+
+    public static CommandManager commandManager;
 
     public static UserCache userCache;
 

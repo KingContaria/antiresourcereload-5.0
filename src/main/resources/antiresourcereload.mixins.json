@@ -4,6 +4,7 @@
   "package": "me.wurgo.antiresourcereload.mixin",
   "compatibilityLevel": "JAVA_8",
   "client": [
+    "IntegratedServerMixin",
     "MinecraftClientMixin",
     "MinecraftServerMixin",
     "RecipeBookWidgetMixin",
