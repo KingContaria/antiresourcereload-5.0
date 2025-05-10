@@ -1,7 +1,6 @@
 package me.wurgo.antiresourcereload;
 
 import com.google.gson.JsonElement;
-import net.fabricmc.api.ModInitializer;
 import net.minecraft.loot.LootManager;
 import net.minecraft.loot.condition.LootConditionManager;
 import net.minecraft.recipe.RecipeManager;
@@ -17,7 +16,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.Map;
 
-public class AntiResourceReload implements ModInitializer {
+public class AntiResourceReload {
     private static final Logger LOGGER = LogManager.getLogger();
 
     public static ReloadableResourceManager dataManager;
@@ -38,10 +37,5 @@ public class AntiResourceReload implements ModInitializer {
     
     public static void log(String message) {
         LOGGER.info("[AntiResourceReload] {}", message);
-    }
-
-    @Override
-    public void onInitialize() {
-        log("Initializing.");
     }
 }

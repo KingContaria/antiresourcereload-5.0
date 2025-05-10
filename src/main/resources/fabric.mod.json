@@ -22,11 +22,6 @@
   "mixins": [
     "antiresourcereload.mixins.json"
   ],
-  "entrypoints": {
-    "main": [
-      "me.wurgo.antiresourcereload.AntiResourceReload"
-    ]
-  },
   "depends": {
     "minecraft": [
       "1.15.x",
